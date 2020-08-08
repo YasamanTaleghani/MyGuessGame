@@ -21,5 +21,9 @@
     <string name="question_ans4">3</string>
     <string name="question_ans5">4</string>
     <string name="question_ans6">5</string>
+    <string name="textView_Cheat_Question">آیا از دیدن پاسخ اطمینان دارید؟</string>
+    <string name="btn_cheat">تقلب</string>
+    <string name="btn_cheat_back">بازگشت</string>
+    <string name="CheatToast">\" تقلب کار خوبی نیست\"</string>
 
 </resources>

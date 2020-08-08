@@ -1,7 +1,10 @@
 package com.example.myguessgame.controller;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -10,7 +13,6 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.example.myguessgame.R;
 import com.example.myguessgame.models.Question;
 
@@ -20,6 +22,8 @@ public class GuessGame extends AppCompatActivity {
     public static final String BUNDLE_M_CURRENT_INDEX = "Bundle_mCurrentIndex";
     public static final String BUNDLE_SCORE = "bundle_score";
     public static final String IS_CLICKED = "IsClicked";
+    public static final String EXTRA_QUESTION_ANSWER = "com.example.myguessgame.extraQuestionAnswer";
+    public static final int REQUEST_CODE_CHEAT = 0;
 
     private TextView mTextView;
     private TextView mScore;
@@ -36,6 +40,7 @@ public class GuessGame extends AppCompatActivity {
     private LinearLayout mFinalScores;
     private TextView mFinalScoreShow;
     private Button mButtonReset;
+    private Button mButtonCheat;
 
     private int mCurrentIndex = 0;
     private Question[] mQuestionBank = {
@@ -48,7 +53,7 @@ public class GuessGame extends AppCompatActivity {
     };
 
     private boolean[] mIsClicked = new boolean[mQuestionBank.length];
-
+    private boolean[] mIsCheater = new boolean[mQuestionBank.length];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,21 +90,27 @@ public class GuessGame extends AppCompatActivity {
     }
 
     private void checkAnswer(boolean userPressed) {
-        if (mQuestionBank[mCurrentIndex].isAnswerTrue() == userPressed) {
-            Toast.makeText(GuessGame.this, R.string.toast_correct, Toast.LENGTH_LONG)
+        if (mIsCheater[mCurrentIndex]){
+            Toast.makeText(GuessGame.this, R.string.CheatToast, Toast.LENGTH_LONG)
                     .show();
-            mCorrectQuestion++;
-            mAnsweredQuestions++;
-            mScore.setText("   امتیاز شما  " + mCorrectQuestion);
-            mFinalScoreShow.setText("   امتیاز شما  " + mCorrectQuestion);
+        }
+        else {
+            if (mQuestionBank[mCurrentIndex].isAnswerTrue() == userPressed) {
+                Toast.makeText(GuessGame.this, R.string.toast_correct, Toast.LENGTH_LONG)
+                        .show();
+                mCorrectQuestion++;
+                mAnsweredQuestions++;
+                mScore.setText("   امتیاز شما  " + mCorrectQuestion);
+                mFinalScoreShow.setText("   امتیاز شما  " + mCorrectQuestion);
 
-        } else {
-            Toast.makeText(GuessGame.this, R.string.toast_incorrect, Toast.LENGTH_SHORT)
-                    .show();
-            mAnsweredQuestions++;
-            mScore.setText("   امتیاز شما  " + mCorrectQuestion);
-            mFinalScoreShow.setText("   امتیاز شما  " + mCorrectQuestion);
+            } else {
+                Toast.makeText(GuessGame.this, R.string.toast_incorrect, Toast.LENGTH_SHORT)
+                        .show();
+                mAnsweredQuestions++;
+                mScore.setText("   امتیاز شما  " + mCorrectQuestion);
+                mFinalScoreShow.setText("   امتیاز شما  " + mCorrectQuestion);
 
+            }
         }
     }
 
@@ -116,6 +127,7 @@ public class GuessGame extends AppCompatActivity {
         mFinalScoreShow = findViewById(R.id.ScoreShow);
         mFinalScores = findViewById(R.id.finalShowScoresLayout);
         mButtonReset = findViewById(R.id.button_reset);
+        mButtonCheat = findViewById(R.id.btn_cheat);
 
     }
 
@@ -212,6 +224,28 @@ public class GuessGame extends AppCompatActivity {
             }
         });
 
+        mButtonCheat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent intent = new Intent(GuessGame.this, CheatActivity.class);
+                intent.putExtra(EXTRA_QUESTION_ANSWER,mQuestionBank[mCurrentIndex].isAnswerTrue());
+                startActivityForResult(intent,REQUEST_CODE_CHEAT);
+            }
+
+        });
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode != Activity.RESULT_OK || data == null )
+            return;
+
+        if (requestCode == REQUEST_CODE_CHEAT )
+            mIsCheater[mCurrentIndex] = data.getBooleanExtra(CheatActivity.EXTRA_IS_CHEAT,false);
     }
 
     private void IsGameOver() {

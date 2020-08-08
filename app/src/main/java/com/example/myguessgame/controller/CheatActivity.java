@@ -44,7 +44,7 @@ public class CheatActivity extends AppCompatActivity {
     }
 
     private void findView(){
-        mButton_cheat = findViewById(R.id.btn_cheat);
+        mButton_cheat = findViewById(R.id.btn_show_cheat);
         mTextView_ShowTheCorrectAnswer = findViewById(R.id.textView_Cheat_answer_show);
     }
 

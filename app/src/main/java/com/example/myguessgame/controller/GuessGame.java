@@ -24,6 +24,7 @@ public class GuessGame extends AppCompatActivity {
     public static final String IS_CLICKED = "IsClicked";
     public static final String EXTRA_QUESTION_ANSWER = "com.example.myguessgame.extraQuestionAnswer";
     public static final int REQUEST_CODE_CHEAT = 0;
+    public static final String BUNDLE_IS_CHEATER = "Bundle_IsCheater";
 
     private TextView mTextView;
     private TextView mScore;
@@ -227,7 +228,6 @@ public class GuessGame extends AppCompatActivity {
         mButtonCheat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 Intent intent = new Intent(GuessGame.this, CheatActivity.class);
                 intent.putExtra(EXTRA_QUESTION_ANSWER,mQuestionBank[mCurrentIndex].isAnswerTrue());
                 startActivityForResult(intent,REQUEST_CODE_CHEAT);
@@ -292,6 +292,7 @@ public class GuessGame extends AppCompatActivity {
         Log.d(GUESS_GAME, "onSaveInstant: " + mCurrentIndex);
         outState.putInt(BUNDLE_M_CURRENT_INDEX, mCurrentIndex);
         outState.putInt(BUNDLE_SCORE, mCorrectQuestion);
+        outState.putBooleanArray(BUNDLE_IS_CHEATER,mIsCheater);
         outState.putBooleanArray(IS_CLICKED, mIsClicked);
     }
 }

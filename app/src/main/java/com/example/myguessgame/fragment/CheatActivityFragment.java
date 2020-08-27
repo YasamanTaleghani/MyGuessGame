@@ -1,4 +1,4 @@
-package com.example.myguessgame.controller;
+package com.example.myguessgame.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;

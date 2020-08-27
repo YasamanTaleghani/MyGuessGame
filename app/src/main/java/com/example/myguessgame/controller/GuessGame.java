@@ -7,8 +7,7 @@ import androidx.fragment.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
 import com.example.myguessgame.R;
-
-import static com.example.myguessgame.controller.GuessGameFragment.REQUEST_CODE_CHEAT;
+import com.example.myguessgame.fragment.GuessGameFragment;
 
 
 public class GuessGame extends AppCompatActivity {

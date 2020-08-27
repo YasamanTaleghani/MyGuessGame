@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical"
-    tools:context=".controller.CheatActivityFragment">
+    tools:context=".fragment.CheatActivityFragment">
 
     <TextView
         android:id="@+id/textView_Cheat_Qurstion"

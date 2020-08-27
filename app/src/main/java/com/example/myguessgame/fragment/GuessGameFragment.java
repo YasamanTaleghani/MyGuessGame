@@ -1,4 +1,4 @@
-package com.example.myguessgame.controller;
+package com.example.myguessgame.fragment;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -19,7 +19,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.myguessgame.R;
+import com.example.myguessgame.Repository.QuestionListRepository;
+import com.example.myguessgame.controller.CheatActivity;
 import com.example.myguessgame.models.Question;
+
+import java.util.Objects;
+import java.util.UUID;
 
 
 public class GuessGameFragment extends Fragment {
@@ -50,16 +55,13 @@ public class GuessGameFragment extends Fragment {
     private Button mButtonCheat;
 
     private int mCurrentIndex = 0;
-    private Question[] mQuestionBank = {
-            new Question(R.string.question_australia, false),
-            new Question(R.string.question_oceans, true),
-            new Question(R.string.question_mideast, false),
-            new Question(R.string.question_africa, true),
-            new Question(R.string.question_americas, false),
-            new Question(R.string.question_asia, false)
-    };
-    private boolean[] mIsClicked = new boolean[mQuestionBank.length];
-    private boolean[] mIsCheater = new boolean[mQuestionBank.length];
+    private Question mQuestion;
+
+    private QuestionListRepository mQuestionListRepository = QuestionListRepository.getInstance();
+    int questionTextResId;
+
+    private boolean[] mIsClicked = new boolean[20];
+    private boolean[] mIsCheater = new boolean[20];
 
     // ------------------------------------------------------------------------------
 
@@ -71,7 +73,13 @@ public class GuessGameFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        questionTextResId = getActivity().getIntent().getIntExtra(QuestionListFragment.
+                        EXTRA_QUESTION_RESID, 0);
 
+        for (int i = 0; i < mQuestionListRepository.getQuestion().size() ; i++) {
+            if (mQuestionListRepository.getQuestion().get(i).getQuestionTextResId() == questionTextResId)
+                mCurrentIndex = i;
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -138,7 +146,8 @@ public class GuessGameFragment extends Fragment {
             @Override
             public void onClick(View view) {
 
-                int questionTextResId = mQuestionBank[mQuestionBank.length - 1].getQuestionTextResId();
+                int questionTextResId = mQuestionListRepository.getQuestion().get(
+                        mCurrentIndex).getQuestionTextResId();
                 mTextView.setText(questionTextResId);
                 if (mIsClicked[mCurrentIndex]) {
                     mTrueButton.setEnabled(false);
@@ -153,7 +162,8 @@ public class GuessGameFragment extends Fragment {
         mDoubleRightButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                int questionTextResId = mQuestionBank[0].getQuestionTextResId();
+                int questionTextResId = mQuestionListRepository.getQuestion().get(0).
+                        getQuestionTextResId();
                 mTextView.setText(questionTextResId);
                 if (mIsClicked[mCurrentIndex]) {
                     mTrueButton.setEnabled(false);
@@ -168,7 +178,7 @@ public class GuessGameFragment extends Fragment {
         mLeftButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mCurrentIndex = (mCurrentIndex + 1) % mQuestionBank.length;
+                mCurrentIndex = (mCurrentIndex + 1) % mQuestionListRepository.getQuestion().size();
                 updateQuestion();
                 if (mIsClicked[mCurrentIndex]) {
                     mTrueButton.setEnabled(false);
@@ -184,7 +194,8 @@ public class GuessGameFragment extends Fragment {
             @Override
             public void onClick(View view) {
 
-                mCurrentIndex = (mCurrentIndex - 1 + mQuestionBank.length) % mQuestionBank.length;
+                mCurrentIndex = (mCurrentIndex - 1 + mQuestionListRepository.getQuestion().size())
+                        % mQuestionListRepository.getQuestion().size();
                 updateQuestion();
                 if (mIsClicked[mCurrentIndex]) {
                     mTrueButton.setEnabled(false);
@@ -208,7 +219,8 @@ public class GuessGameFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getActivity(), CheatActivity.class);
-                intent.putExtra(EXTRA_QUESTION_ANSWER,mQuestionBank[mCurrentIndex].isAnswerTrue());
+                intent.putExtra(EXTRA_QUESTION_ANSWER, mQuestionListRepository.getQuestion().
+                        get(mCurrentIndex).isAnswerTrue());
                 startActivityForResult(intent,REQUEST_CODE_CHEAT);
             }
 
@@ -231,7 +243,7 @@ public class GuessGameFragment extends Fragment {
     }
 
     private void IsGameOver() {
-        if (mAnsweredQuestions == mQuestionBank.length) {
+        if (mAnsweredQuestions == mQuestionListRepository.getQuestion().size()) {
             main.setVisibility(View.GONE);
             mFinalScoreShow.setText("   امتیاز نهایی شما  " + mCorrectQuestion);
             mFinalScores.setVisibility(View.VISIBLE);
@@ -239,8 +251,8 @@ public class GuessGameFragment extends Fragment {
     }
 
     private void updateQuestion() {
-
-        int questionTextResId = mQuestionBank[mCurrentIndex].getQuestionTextResId();
+        questionTextResId = mQuestionListRepository.getQuestion().get(mCurrentIndex).
+                getQuestionTextResId();
         mTextView.setText(questionTextResId);
         mScore.setText("   امتیاز شما  " + mCorrectQuestion);
         mFinalScoreShow.setText("   امتیاز شما  " + mCorrectQuestion);
@@ -260,7 +272,7 @@ public class GuessGameFragment extends Fragment {
                     .show();
         }
         else {
-            if (mQuestionBank[mCurrentIndex].isAnswerTrue() == userPressed) {
+            if (Objects.equals(mQuestionListRepository.getQuestion().get(mCurrentIndex).isAnswerTrue(), userPressed)) {
                 Toast.makeText(getContext(), R.string.toast_correct, Toast.LENGTH_LONG)
                         .show();
                 mCorrectQuestion++;
